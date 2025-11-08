@@ -1,0 +1,29 @@
+package com.wipro.foundation.ecommerce.product.service.impl;
+import com.wipro.foundation.ecommerce.product.entity.Product;
+import com.wipro.foundation.ecommerce.product.repository.ProductRepository;
+import com.wipro.foundation.ecommerce.product.service.ProductService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Optional;
+
+@Service @Transactional
+public class ProductServiceImpl implements ProductService {
+    private final ProductRepository repo;
+    public ProductServiceImpl(ProductRepository repo){ this.repo = repo; }
+
+    @Override public Product add(Product p){ return repo.save(p); }
+    @Override
+    public Product update(Long id, Product p){
+        return repo.findById(id).map(e->{
+            e.setName(p.getName());
+            e.setDescription(p.getDescription());
+            e.setPrice(p.getPrice());
+            e.setCategory(p.getCategory());
+            return repo.save(e);
+        }).orElseThrow(()->new IllegalArgumentException("Product not found"));
+    }
+    @Override public void delete(Long id){ repo.deleteById(id); }
+    @Override public Optional<Product> get(Long id){ return repo.findById(id); }
+    @Override public List<Product> getAll(){ return repo.findAll(); }
+}
